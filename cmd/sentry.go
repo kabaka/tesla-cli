@@ -8,10 +8,9 @@ import (
 
 // sentryCmd represents the sentry command
 var sentryCmd = &cobra.Command{
-	Use:   "sentry status|on|off",
+	Use:   "sentry",
 	Short: "enable or disable Sentry Mode",
 	Long:  `Enable or disable Sentry Mode.`,
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 var sentryOnCmd = &cobra.Command{
