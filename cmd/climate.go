@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -26,6 +27,7 @@ cooled as needed to reach and  maintain the target temperature.`,
 
 		if err != nil {
 			fmt.Printf("Error enabling climate control: %s\n", err)
+			os.Exit(1)
 		}
 
 		fmt.Println("Climate control enabled.")
@@ -45,6 +47,7 @@ cooled unless cabin overheat protection is enabled.`,
 
 		if err != nil {
 			fmt.Printf("Error enabling climate control: %s\n", err)
+			os.Exit(1)
 		}
 
 		fmt.Println("Climate control disabled.")
@@ -61,6 +64,7 @@ var climateStatusCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Printf("Error retrieving climate control status: %s\n", err)
+			os.Exit(1)
 		}
 
 		if state.IsClimateOn {

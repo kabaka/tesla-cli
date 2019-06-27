@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,7 @@ var sentryOnCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Printf("Error enabling sentry mode: %s\n", err)
+			os.Exit(1)
 		}
 
 		fmt.Println("Sentry mode enabled.")
@@ -39,6 +41,7 @@ var sentryOffCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Printf("Error enabling sentry mode: %s\n", err)
+			os.Exit(1)
 		}
 
 		fmt.Println("Sentry mode disabled.")
@@ -55,6 +58,7 @@ var sentryStatusCmd = &cobra.Command{
 
 		if err != nil {
 			fmt.Printf("Error retrieving sentry mode status: %s\n", err)
+			os.Exit(1)
 		}
 
 		if state.SentryMode {
