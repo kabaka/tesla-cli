@@ -60,6 +60,7 @@ func initConfig() {
 
 // GetTeslaVehicle returns a Tesla vehicle object with active API connection
 func GetTeslaVehicle() struct{ *tesla.Vehicle } {
+	// TODO: store token and try to reuse before re-authenticating
 	client, err := tesla.NewClient(
 		&tesla.Auth{
 			ClientID:     viper.GetString("client_id"),
