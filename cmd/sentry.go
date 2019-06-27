@@ -54,7 +54,7 @@ var sentryStatusCmd = &cobra.Command{
 		state, err := vehicle.VehicleState()
 
 		if err != nil {
-			fmt.Printf("Error enabling sentry mode: %s\n", err)
+			fmt.Printf("Error retrieving sentry mode status: %s\n", err)
 		}
 
 		if state.SentryMode {
