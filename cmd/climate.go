@@ -16,8 +16,10 @@ var climateCmd = &cobra.Command{
 var climateOnCmd = &cobra.Command{
 	Use:   "on",
 	Short: "enable climate control",
-	Long: `Enable climate control, which will begin heating or cooling the
-    interior of the vehicle as needed.`,
+	Long: `Enable climate control.
+
+When climate control is enabled, the interior of the vehicle is heated or
+cooled as needed to reach and  maintain the target temperature.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vehicle := GetTeslaVehicle()
 		err := vehicle.StartAirConditioning()
@@ -33,8 +35,10 @@ var climateOnCmd = &cobra.Command{
 var climateOffCmd = &cobra.Command{
 	Use:   "off",
 	Short: "disable climat econtrol",
-	Long: `Disable climate control, which will stop heating or cooling of the
-		interior of the vehicle.`,
+	Long: `Disable climate control.
+
+When climate control is disabled, the interior of the vehicle is not heated or
+cooled unless cabin overheat protection is enabled.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vehicle := GetTeslaVehicle()
 		err := vehicle.StopAirConditioning()
@@ -50,8 +54,7 @@ var climateOffCmd = &cobra.Command{
 var climateStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "get climate control status",
-	Long: `Determine whether climate control is currently enabled or disabled,
-		as well as the target temperature range.`,
+	Long:  `Determine the current status of climate control.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vehicle := GetTeslaVehicle()
 		state, err := vehicle.ClimateState()
