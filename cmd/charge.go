@@ -61,7 +61,26 @@ var chargeStatusCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		fmt.Printf("Charge state: %s\n", state.ChargingState)
+		if state.ChargingState == "Charging" {
+			fmt.Printf("The vehicle is currently charging at %.1f miles/hour (%.0f volts, %.0f/%.0f amps). %.2f hours remaining.\n",
+				state.ChargeRate, state.ChargerVoltage, state.ChargerActualCurrent, state.ChargerPilotCurrent, state.TimeToFullCharge)
+			fmt.Printf("%.2f miles added.\n", state.ChargeMilesAddedRated)
+		} else {
+			fmt.Println("The vehicle is not charging.")
+
+			if state.ManagedChargingActive {
+				fmt.Println("Charging is scheduled to start at ...") // XXX
+			} else {
+				if state.ChargePortDoorOpen {
+					fmt.Println("The charge port is open.")
+				} else {
+					fmt.Println("The charge port is closed.")
+				}
+			}
+		}
+
+		fmt.Printf("Limit: %d%%\n", state.ChargeLimitSoc)
+		fmt.Printf("Battery Level: %d%%\n", state.BatteryLevel)
 	},
 }
 
