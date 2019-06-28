@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cheggaaa/pb"
 	"github.com/kabaka/tesla"
 	"github.com/spf13/cobra"
 )
@@ -135,8 +136,38 @@ var chargeStatusCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Printf("Limit: %d%%\n", state.ChargeLimitSoc)
-		fmt.Printf("Battery Level: %d%%\n", state.BatteryLevel)
+		// Abuse progress bars to display charge limit and current charge.
+		// Note: the pb library usually wants bars to end with a call to `Finish()`
+		// but this changes the output in unhelpful ways, so instead we print a
+		// newline and just discard the bar each time
+
+		// TODO: find a better library or write something here to display this in a
+		//       less goofy way.
+
+		// TODO: display charge rate info along with the bar
+		// TODO: stream or poll for charge status to display real-time bar
+
+		bar := pb.New(100)
+
+		bar.Prefix("Charge Limit  ")
+		bar.SetWidth(80)
+		bar.Set(state.ChargeLimitSoc)
+		bar.ShowCounters = false
+		bar.Format("  v  ")
+
+		bar.Start()
+		fmt.Println()
+
+		bar = pb.New(100)
+
+		bar.Prefix("Battery Level ")
+		bar.SetWidth(80)
+		bar.Set(state.BatteryLevel)
+		bar.ShowCounters = false
+		bar.Format("[-| ]")
+
+		bar.Start()
+		fmt.Println()
 	},
 }
 
