@@ -124,7 +124,7 @@ var chargeStatusCmd = &cobra.Command{
 		} else {
 			fmt.Println("The vehicle is not charging.")
 
-			if state.ScheduledChargingStartTime != nil {
+			if state.ScheduledChargingPending {
 				fmt.Printf("Charging is scheduled to start at %s.\n", time.Unix(int64(state.ScheduledChargingStartTime.(float64)), 0).In(time.Local).Format("15:04:05 MST"))
 			} else {
 				if state.ChargePortDoorOpen {
