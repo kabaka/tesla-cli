@@ -69,6 +69,9 @@ var climateStatusCmd = &cobra.Command{
 
 		if state.IsClimateOn {
 			fmt.Println("Climate control is enabled.")
+			fmt.Printf("Current Fan Speed: %.0f\n", state.FanStatus)
+			fmt.Printf("Driver: %.1f˚C\n", state.DriverTempSetting)
+			fmt.Printf("Passenger: %.1f˚C\n", state.PassengerTempSetting)
 		} else {
 			fmt.Println("Climate control is disabled.")
 		}
