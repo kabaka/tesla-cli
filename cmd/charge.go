@@ -3,7 +3,9 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/kabaka/tesla"
 	"github.com/spf13/cobra"
 )
 
@@ -20,6 +22,23 @@ var chargeStartCmd = &cobra.Command{
 	Long:  `Start charging the vehicle if it is plugged in.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		vehicle := GetTeslaVehicle()
+
+		limit, _ := cmd.Flags().GetInt("limit")
+
+		if limit != 0 {
+			if limit < 0 || limit > 100 {
+				fmt.Println("Invalid charge limit: value must be between 1 and 100.")
+				os.Exit(1)
+			}
+
+			err := vehicle.SetChargeLimit(limit)
+
+			if err != nil {
+				fmt.Printf("Error while setting charge limit: %s\n", err)
+				os.Exit(1)
+			}
+		}
+
 		err := vehicle.StartCharging()
 
 		if err != nil {
@@ -68,8 +87,8 @@ var chargeStatusCmd = &cobra.Command{
 		} else {
 			fmt.Println("The vehicle is not charging.")
 
-			if state.ManagedChargingActive {
-				fmt.Println("Charging is scheduled to start at ...") // XXX
+			if state.ManagedChargingStartTime != nil {
+				fmt.Printf("Charging is scheduled to start at %s\n", state.ManagedChargingStartTime)
 			} else {
 				if state.ChargePortDoorOpen {
 					fmt.Println("The charge port is open.")
@@ -84,9 +103,53 @@ var chargeStatusCmd = &cobra.Command{
 	},
 }
 
+// KwhCapacity determines the max battery capacity in kWh based on option codes
+func KwhCapacity(v struct{ *tesla.Vehicle }) int {
+	options := strings.Split(v.OptionCodes, ",")
+
+	// TODO this is based on the list at
+	// https://tesla-api.timdorr.com/vehicle/optioncodes but that list has proven
+	// to be inaccurate and incomplete. As it is _so_ incomplete that it is
+	// basically unusable, this function will not be used at this time.
+	for _, option := range options {
+		switch option {
+		case "BT40":
+			return 40
+		case "BR03":
+		case "BT60":
+			return 60
+		case "BR05":
+		case "BTX5":
+		case "BTX7":
+		case "BT37":
+			return 75
+		case "BT85":
+		case "BTX8":
+			return 85
+		case "BTX4":
+			return 90
+		case "BTX6":
+			return 100
+		}
+	}
+
+	fmt.Printf("No recognized battery option codes in: %s\n", v.OptionCodes)
+	os.Exit(1)
+
+	return 0 // unreachable
+}
+
+// KwhRemaining calculates the vehicle's remaining kWh
+func KwhRemaining(v struct{ *tesla.Vehicle }) float64 {
+	state, _ := v.ChargeState()
+	return float64(KwhCapacity(v)) / float64(state.BatteryLevel)
+}
+
 func init() {
 	rootCmd.AddCommand(chargeCmd)
 	chargeCmd.AddCommand(chargeStartCmd)
 	chargeCmd.AddCommand(chargeStopCmd)
 	chargeCmd.AddCommand(chargeStatusCmd)
+
+	chargeStartCmd.Flags().IntP("limit", "l", 0, "Charge limit (%)")
 }
