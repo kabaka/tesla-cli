@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -48,6 +49,39 @@ var chargeStartCmd = &cobra.Command{
 		}
 
 		fmt.Println("Charging started.")
+	},
+}
+
+var chargeLimitCmd = &cobra.Command{
+	Use:   "limit",
+	Short: "set charge limit",
+	Long:  `Set the maximum charge limit to be used in the current or next charging session.`,
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		vehicle := GetTeslaVehicle()
+
+		limit, err := strconv.ParseInt(args[0], 0, 0)
+
+		if err != nil {
+			fmt.Println("Invalid charge limit: value must be between 1 and 100.")
+			os.Exit(1)
+		}
+
+		if limit != 0 {
+			if limit < 0 || limit > 100 {
+				fmt.Println("Invalid charge limit: value must be between 1 and 100.")
+				os.Exit(1)
+			}
+
+			err := vehicle.SetChargeLimit(int(limit))
+
+			if err != nil {
+				fmt.Printf("Error while setting charge limit: %s\n", err)
+				os.Exit(1)
+			}
+		}
+
+		fmt.Printf("Charge limit set to %d.\n", limit)
 	},
 }
 
@@ -153,6 +187,7 @@ func init() {
 	chargeCmd.AddCommand(chargeStartCmd)
 	chargeCmd.AddCommand(chargeStopCmd)
 	chargeCmd.AddCommand(chargeStatusCmd)
+	chargeCmd.AddCommand(chargeLimitCmd)
 
 	chargeStartCmd.Flags().IntP("limit", "l", 0, "Charge limit (%)")
 }
