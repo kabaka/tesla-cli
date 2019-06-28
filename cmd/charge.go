@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/kabaka/tesla"
 	"github.com/spf13/cobra"
@@ -80,6 +81,8 @@ var chargeStatusCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		// TODO: format this in a more readable (not prose) way
+
 		if state.ChargingState == "Charging" {
 			fmt.Printf("The vehicle is currently charging at %.1f miles/hour (%.0f volts, %.0f/%.0f amps). %.2f hours remaining.\n",
 				state.ChargeRate, state.ChargerVoltage, state.ChargerActualCurrent, state.ChargerPilotCurrent, state.TimeToFullCharge)
@@ -87,8 +90,8 @@ var chargeStatusCmd = &cobra.Command{
 		} else {
 			fmt.Println("The vehicle is not charging.")
 
-			if state.ManagedChargingStartTime != nil {
-				fmt.Printf("Charging is scheduled to start at %s\n", state.ManagedChargingStartTime)
+			if state.ScheduledChargingStartTime != nil {
+				fmt.Printf("Charging is scheduled to start at %s.\n", time.Unix(int64(state.ScheduledChargingStartTime.(float64)), 0).In(time.Local).Format("15:04:05 MST"))
 			} else {
 				if state.ChargePortDoorOpen {
 					fmt.Println("The charge port is open.")
