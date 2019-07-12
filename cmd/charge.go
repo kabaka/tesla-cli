@@ -171,6 +171,40 @@ var chargeStatusCmd = &cobra.Command{
 	},
 }
 
+var chargeOpenCmd = &cobra.Command{
+	Use:   "open",
+	Short: "open charge port",
+	Long:  `If the charge port is motorized, open it.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		vehicle := GetTeslaVehicle()
+		err := vehicle.OpenChargePort()
+
+		if err != nil {
+			fmt.Printf("Error while trying to open the charge port: %s\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Charge port opened.")
+	},
+}
+
+var chargeCloseCmd = &cobra.Command{
+	Use:   "close",
+	Short: "close charge port",
+	Long:  `If the charge port is motorized, close it.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		vehicle := GetTeslaVehicle()
+		err := vehicle.CloseChargePort()
+
+		if err != nil {
+			fmt.Printf("Error while trying to close the charge port: %s\n", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Charge port closeed.")
+	},
+}
+
 // KwhCapacity determines the max battery capacity in kWh based on option codes
 func KwhCapacity(v struct{ *tesla.Vehicle }) int {
 	options := strings.Split(v.OptionCodes, ",")
@@ -178,7 +212,7 @@ func KwhCapacity(v struct{ *tesla.Vehicle }) int {
 	// TODO this is based on the list at
 	// https://tesla-api.timdorr.com/vehicle/optioncodes but that list has proven
 	// to be inaccurate and incomplete. As it is _so_ incomplete that it is
-	// basically unusable, this function will not be used at this time.
+	// basically unusable, this function should not be used at this time.
 	for _, option := range options {
 		switch option {
 		case "BT40":
@@ -219,6 +253,8 @@ func init() {
 	chargeCmd.AddCommand(chargeStopCmd)
 	chargeCmd.AddCommand(chargeStatusCmd)
 	chargeCmd.AddCommand(chargeLimitCmd)
+	chargeCmd.AddCommand(chargeOpenCmd)
+	chargeCmd.AddCommand(chargeCloseCmd)
 
 	chargeStartCmd.Flags().IntP("limit", "l", 0, "Charge limit (%)")
 }
